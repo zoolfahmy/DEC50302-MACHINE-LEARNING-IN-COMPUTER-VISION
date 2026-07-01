@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DEC50302: Machine Learning in Computer Vision | Digital Textbook</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Prism for code highlighting (simulating textbook code blocks) -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+
+    <!-- 
+    PALETTE: Vibrant Tech
+    Primary: #0ea5e9 (Sky 500)
+    Secondary: #6366f1 (Indigo 500)
+    Accent: #f43f5e (Rose 500)
+    Background: #0f172a (Slate 900)
+    Text: #f8fafc (Slate 50)
+    -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            dark: '#0f172a',
+                            light: '#1e293b',
+                            primary: '#0ea5e9',
+                            secondary: '#6366f1',
+                            accent: '#f43f5e',
+                            text: '#f8fafc',
+                            muted: '#94a3b8'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['Fira Code', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom Chart Container Styling */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            height: 350px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+
+        /* Flowchart Styles (No SVG/Mermaid) */
+        .flow-step {
+            position: relative;
+        }
+        .flow-line::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            width: 2px;
+            height: 2rem; /* Tailwind h-8 */
+            background-color: #6366f1; /* Indigo 500 */
+            transform: translateX(-50%);
+        }
+        .flow-line-last::after {
+            display: none;
+        }
+        /* Horizontal flow on desktop */
+        @media (min-width: 768px) {
+            .flow-line::after {
+                top: 50%;
+                left: 100%;
+                width: 2rem;
+                height: 2px;
+                transform: translateY(-50%);
+            }
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
+        }
+        
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-brand-primary selection:text-white pb-20">
+
+    <!-- Navigation -->
+    <nav class="sticky top-0 z-50 glass-panel border-b border-white/10 shadow-lg">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 bg-gradient-to-br from-brand-primary to-brand-secondary rounded-lg flex items-center justify-center font-bold text-white">CV</div>
+                <h1 class="text-xl font-bold tracking-tight text-white">DEC50302 <span class="text-brand-primary font-normal">| Machine Learning in CV</span></h1>
+            </div>
+            <div class="hidden md:flex gap-6 text-sm font-medium text-brand-muted">
+                <a href="#overview" class="hover:text-brand-primary transition-colors">Overview</a>
+                <a href="#resources" class="hover:text-brand-primary transition-colors">Textbook &amp; Labs</a>
+                <a href="#foundations" class="hover:text-brand-primary transition-colors">Foundations</a>
+                <a href="#workflow" class="hover:text-brand-primary transition-colors">ML Workflow</a>
+                <a href="#practical" class="hover:text-brand-primary transition-colors">Practical</a>
+                <a href="syllabus.html" class="ml-2 bg-brand-secondary/20 text-brand-secondary border border-brand-secondary/30 px-3 py-1.5 rounded-full hover:bg-brand-secondary/30 transition-colors">Full Syllabus &amp; Schedule →</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="relative pt-20 pb-32 overflow-hidden">
+        <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1620712943543-bcc4688e7485?q=80&w=2000&auto=format&fit=crop')] bg-cover bg-center opacity-10"></div>
+        <div class="absolute inset-0 bg-gradient-to-b from-brand-dark/50 to-brand-dark"></div>
+        
+        <div class="container mx-auto px-6 relative z-10 text-center">
+            <span class="inline-block py-1 px-3 rounded-full bg-brand-secondary/20 text-brand-secondary border border-brand-secondary/30 text-sm font-semibold mb-6">Diploma in Electronic Engineering (Computer)</span>
+            <h1 class="text-5xl md:text-7xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-brand-primary via-white to-brand-secondary">
+                Machine Learning in<br>Computer Vision
+            </h1>
+            <p class="text-xl text-brand-muted max-w-2xl mx-auto leading-relaxed">
+                A comprehensive digital textbook designed to master Python, OpenCV, and Machine Learning workflows for building intelligent vision applications.
+            </p>
+            <div class="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="#resources" class="bg-brand-primary hover:bg-sky-400 text-white font-bold py-3 px-8 rounded-full transition-colors shadow-lg shadow-brand-primary/30">📘 Open the Textbook</a>
+                <a href="#resources" class="bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold py-3 px-8 rounded-full transition-colors">🧪 Start Practical Work 1</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- SECTION 1: Course Overview & Analytics -->
+    <section id="overview" class="container mx-auto px-6 -mt-20 relative z-20 mb-24">
+        <!-- Intro Cards Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            <div class="glass-panel p-8 rounded-2xl shadow-xl border-t-4 border-brand-primary">
+                <h3 class="text-2xl font-bold mb-2">CLO 1</h3>
+                <p class="text-brand-primary font-semibold mb-4">Apply ML Methods</p>
+                <p class="text-brand-muted text-sm">Develop robust applications using Python programming and OpenCV library for image processing tasks.</p>
+            </div>
+            <div class="glass-panel p-8 rounded-2xl shadow-xl border-t-4 border-brand-secondary">
+                <h3 class="text-2xl font-bold mb-2">CLO 2</h3>
+                <p class="text-brand-secondary font-semibold mb-4">Construct Applications</p>
+                <p class="text-brand-muted text-sm">Build suitable applications integrating Machine Learning models (Teachable Machines, TensorFlow) with real-world data.</p>
+            </div>
+            <div class="glass-panel p-8 rounded-2xl shadow-xl border-t-4 border-brand-accent">
+                <h3 class="text-2xl font-bold mb-2">CLO 3</h3>
+                <p class="text-brand-accent font-semibold mb-4">Continuous Learning</p>
+                <p class="text-brand-muted text-sm">Demonstrate independent acquisition of new knowledge and skills in developing vision-based solutions.</p>
+            </div>
+        </div>
+
+        <!-- Assessment Breakdown Visualization -->
+        <div class="glass-panel rounded-2xl p-8 md:p-12">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                <div>
+                    <h2 class="text-3xl font-bold mb-6">Course Assessment Strategy</h2>
+                    <p class="text-brand-muted mb-6">
+                        This course is 100% Continuous Assessment (CA). Success relies heavily on practical application and project work rather than traditional exams. The breakdown below illustrates the weightage of each component, emphasizing hands-on skills.
+                    </p>
+                    <ul class="space-y-4">
+                        <li class="flex items-center gap-3">
+                            <div class="w-3 h-3 rounded-full bg-brand-primary"></div>
+                            <span class="text-white"><strong>Practical Work (40%):</strong> 5 Lab Exercises focusing on Python & OpenCV.</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <div class="w-3 h-3 rounded-full bg-brand-accent"></div>
+                            <span class="text-white"><strong>Mini Project (40%):</strong> Comprehensive development of an ML App.</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <div class="w-3 h-3 rounded-full bg-brand-secondary"></div>
+                            <span class="text-white"><strong>Theory Test (20%):</strong> Evaluation of core concepts and logic.</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="chart-container">
+                    <canvas id="assessmentChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ================= RESOURCES: FULL TEXTBOOK + PRACTICAL WORK LABS ================= -->
+    <section id="resources" class="container mx-auto px-6 mb-24 relative z-20">
+        <div class="text-center mb-12">
+            <h4 class="text-brand-primary font-bold tracking-widest uppercase text-sm mb-2">Your Companion Volumes</h4>
+            <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">Full Digital Textbook &amp; Lab Companion</h2>
+            <p class="text-brand-muted max-w-2xl mx-auto">
+                Everything on this page links back to two complete, downloadable volumes: the full course textbook and the step-by-step guide for all 5 Practical Works. Tap a card to open it.
+            </p>
+        </div>
+
+        <!-- Two primary volume cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
+            <!-- Textbook Card -->
+            <div class="glass-panel rounded-2xl p-8 border-t-4 border-brand-primary hover:-translate-y-1 transition-transform duration-300 flex flex-col">
+                <div class="flex items-start justify-between mb-4">
+                    <div class="text-4xl">📘</div>
+                    <span class="bg-brand-primary/20 text-brand-primary text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">Main Textbook</span>
+                </div>
+                <h3 class="text-2xl font-bold text-white mb-2">Seeing Like a Machine</h3>
+                <p class="text-sm text-brand-muted mb-6 flex-grow">
+                    The full storytelling-style textbook for DEC50302 — Python foundations, OpenCV, Machine Learning applications, four applied projects, active learning, and AI ethics, following Amir's Smart Guardhouse build.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-3">
+                    <a href="assets/textbook/Seeing_Like_a_Machine_DEC50302_Textbook.pdf" target="_blank" rel="noopener"
+                       class="flex-1 text-center bg-brand-primary hover:bg-sky-400 text-white font-bold py-3 px-4 rounded-xl transition-colors shadow-lg shadow-brand-primary/20">
+                       📖 Open Textbook (PDF)
+                    </a>
+                    <a href="assets/textbook/Seeing_Like_a_Machine_DEC50302_Textbook.docx" download
+                       class="flex-1 text-center bg-white/5 hover:bg-white/10 border border-white/20 text-white font-semibold py-3 px-4 rounded-xl transition-colors">
+                       ⬇️ Download DOCX
+                    </a>
+                </div>
+                <!-- Quick chapter jump chips -->
+                <div class="mt-5 pt-5 border-t border-white/10">
+                    <p class="text-xs font-bold text-brand-muted uppercase tracking-wide mb-2">Jump to a Unit</p>
+                    <div class="flex flex-wrap gap-2">
+                        <a href="assets/textbook/Seeing_Like_a_Machine_DEC50302_Textbook.pdf#page=3" target="_blank" rel="noopener" class="text-xs bg-brand-light hover:bg-brand-primary/30 text-brand-muted hover:text-white px-3 py-1.5 rounded-full border border-white/10 transition-colors">Unit 1 · Python</a>
+                        <a href="assets/textbook/Seeing_Like_a_Machine_DEC50302_Textbook.pdf#page=13" target="_blank" rel="noopener" class="text-xs bg-brand-light hover:bg-brand-primary/30 text-brand-muted hover:text-white px-3 py-1.5 rounded-full border border-white/10 transition-colors">Unit 2 · OpenCV</a>
+                        <a href="assets/textbook/Seeing_Like_a_Machine_DEC50302_Textbook.pdf#page=20" target="_blank" rel="noopener" class="text-xs bg-brand-light hover:bg-brand-primary/30 text-brand-muted hover:text-white px-3 py-1.5 rounded-full border border-white/10 transition-colors">Unit 3 · ML</a>
+                        <a href="assets/textbook/Seeing_Like_a_Machine_DEC50302_Textbook.pdf#page=25" target="_blank" rel="noopener" class="text-xs bg-brand-light hover:bg-brand-primary/30 text-brand-muted hover:text-white px-3 py-1.5 rounded-full border border-white/10 transition-colors">Unit 4 · Projects</a>
+                        <a href="assets/textbook/Seeing_Like_a_Machine_DEC50302_Textbook.pdf#page=29" target="_blank" rel="noopener" class="text-xs bg-brand-light hover:bg-brand-primary/30 text-brand-muted hover:text-white px-3 py-1.5 rounded-full border border-white/10 transition-colors">Unit 5 · Assessment</a>
+                        <a href="assets/textbook/Seeing_Like_a_Machine_DEC50302_Textbook.pdf#page=31" target="_blank" rel="noopener" class="text-xs bg-brand-light hover:bg-brand-primary/30 text-brand-muted hover:text-white px-3 py-1.5 rounded-full border border-white/10 transition-colors">Unit 6 · Ethics</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lab Companion Card -->
+            <div class="glass-panel rounded-2xl p-8 border-t-4 border-brand-secondary hover:-translate-y-1 transition-transform duration-300 flex flex-col">
+                <div class="flex items-start justify-between mb-4">
+                    <div class="text-4xl">🧪</div>
+                    <span class="bg-brand-secondary/20 text-brand-secondary text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">Lab Companion</span>
+                </div>
+                <h3 class="text-2xl font-bold text-white mb-2">Amir's Lab Companion</h3>
+                <p class="text-sm text-brand-muted mb-6 flex-grow">
+                    The full step-by-step build guide for Practical Work 1–5 — matching your official CIDOS lab sheets exactly, with fixed/robust code, troubleshooting notes, and links back to the textbook theory.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-3">
+                    <a href="assets/labs/Amirs_Lab_Companion_PW1-5.pdf" target="_blank" rel="noopener"
+                       class="flex-1 text-center bg-brand-secondary hover:bg-indigo-400 text-white font-bold py-3 px-4 rounded-xl transition-colors shadow-lg shadow-brand-secondary/20">
+                       📖 Open Companion (PDF)
+                    </a>
+                    <a href="assets/labs/Amirs_Lab_Companion_PW1-5.docx" download
+                       class="flex-1 text-center bg-white/5 hover:bg-white/10 border border-white/20 text-white font-semibold py-3 px-4 rounded-xl transition-colors">
+                       ⬇️ Download DOCX
+                    </a>
+                </div>
+                <div class="mt-5 pt-5 border-t border-white/10">
+                    <p class="text-xs font-bold text-brand-muted uppercase tracking-wide mb-2">All 5 Practical Works below ↓</p>
+                    <p class="text-xs text-brand-muted">Each card opens straight to that lab's page in the Companion PDF.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Five Practical Work quick-open cards -->
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+            <a href="assets/labs/Amirs_Lab_Companion_PW1-5.pdf#page=2" target="_blank" rel="noopener"
+               class="group bg-brand-light/50 hover:bg-brand-primary/20 border border-white/5 hover:border-brand-primary/50 rounded-xl p-4 text-center transition-all">
+                <div class="text-2xl mb-2 group-hover:scale-110 transition-transform">🐍</div>
+                <div class="text-xs font-bold text-brand-primary uppercase tracking-wide mb-1">PW 1</div>
+                <div class="text-xs text-white font-semibold leading-snug">Intro to Python</div>
+            </a>
+            <a href="assets/labs/Amirs_Lab_Companion_PW1-5.pdf#page=9" target="_blank" rel="noopener"
+               class="group bg-brand-light/50 hover:bg-brand-primary/20 border border-white/5 hover:border-brand-primary/50 rounded-xl p-4 text-center transition-all">
+                <div class="text-2xl mb-2 group-hover:scale-110 transition-transform">🖼️</div>
+                <div class="text-xs font-bold text-brand-primary uppercase tracking-wide mb-1">PW 2</div>
+                <div class="text-xs text-white font-semibold leading-snug">Image Processing Basics</div>
+            </a>
+            <a href="assets/labs/Amirs_Lab_Companion_PW1-5.pdf#page=17" target="_blank" rel="noopener"
+               class="group bg-brand-light/50 hover:bg-brand-secondary/20 border border-white/5 hover:border-brand-secondary/50 rounded-xl p-4 text-center transition-all">
+                <div class="text-2xl mb-2 group-hover:scale-110 transition-transform">🎯</div>
+                <div class="text-xs font-bold text-brand-secondary uppercase tracking-wide mb-1">PW 3</div>
+                <div class="text-xs text-white font-semibold leading-snug">OpenCV Image &amp; Video</div>
+            </a>
+            <a href="assets/labs/Amirs_Lab_Companion_PW1-5.pdf#page=37" target="_blank" rel="noopener"
+               class="group bg-brand-light/50 hover:bg-brand-secondary/20 border border-white/5 hover:border-brand-secondary/50 rounded-xl p-4 text-center transition-all">
+                <div class="text-2xl mb-2 group-hover:scale-110 transition-transform">🤖</div>
+                <div class="text-xs font-bold text-brand-secondary uppercase tracking-wide mb-1">PW 4</div>
+                <div class="text-xs text-white font-semibold leading-snug">Teachable Machine &amp; TensorFlow</div>
+            </a>
+            <a href="assets/labs/Amirs_Lab_Companion_PW1-5.pdf#page=46" target="_blank" rel="noopener"
+               class="group bg-brand-light/50 hover:bg-brand-accent/20 border border-white/5 hover:border-brand-accent/50 rounded-xl p-4 text-center transition-all">
+                <div class="text-2xl mb-2 group-hover:scale-110 transition-transform">🚀</div>
+                <div class="text-xs font-bold text-brand-accent uppercase tracking-wide mb-1">PW 5</div>
+                <div class="text-xs text-white font-semibold leading-snug">YOLOv8 via VS Code &amp; Colab</div>
+            </a>
+        </div>
+    </section>
+    <!-- ================= END RESOURCES ================= -->
+
+    <!-- SECTION 2: Foundations (Python & OpenCV) -->
+    <section id="foundations" class="container mx-auto px-6 mb-24">
+        <div class="flex items-end justify-between mb-12 border-b border-white/10 pb-4">
+            <div>
+                <h4 class="text-brand-primary font-bold tracking-widest uppercase text-sm mb-2">Chapter 01</h4>
+                <h2 class="text-3xl md:text-4xl font-bold">Foundations of Computer Vision</h2>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+            <!-- Content Column -->
+            <div class="space-y-8">
+                <div>
+                    <h3 class="text-2xl font-bold text-white mb-4">Why Python for CV?</h3>
+                    <p class="text-brand-muted leading-relaxed mb-4">
+                        Python is the de-facto language for Machine Learning and Computer Vision due to its simplicity and vast ecosystem of libraries. In DEC50302, we leverage two main pillars:
+                    </p>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-brand-light p-4 rounded-lg border border-white/5">
+                            <strong class="text-brand-secondary block mb-1">NumPy</strong>
+                            <span class="text-xs text-brand-muted">Handles matrix operations. Images are essentially matrices of pixel values.</span>
+                        </div>
+                        <div class="bg-brand-light p-4 rounded-lg border border-white/5">
+                            <strong class="text-brand-primary block mb-1">OpenCV</strong>
+                            <span class="text-xs text-brand-muted">Open Source Computer Vision Library. Optimized for real-time image processing.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="text-2xl font-bold text-white mb-4">Core Image Operations</h3>
+                    <p class="text-brand-muted leading-relaxed mb-4">
+                        Before feeding data into a machine learning model, images must be pre-processed. Common techniques include:
+                    </p>
+                    <ul class="list-none space-y-3">
+                        <li class="flex items-start gap-3">
+                            <span class="text-brand-primary mt-1">✓</span>
+                            <span class="text-brand-muted"><strong>Grayscale Conversion:</strong> Reduces complexity by removing color channels (3 channels -> 1 channel).</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="text-brand-primary mt-1">✓</span>
+                            <span class="text-brand-muted"><strong>Resizing:</strong> Standardizing image dimensions for model input (e.g., 224x224 pixels).</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="text-brand-primary mt-1">✓</span>
+                            <span class="text-brand-muted"><strong>Thresholding:</strong> Creating binary images to separate objects from backgrounds.</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Code Column -->
+            <div class="bg-[#1e1e1e] rounded-xl overflow-hidden shadow-2xl border border-white/10">
+                <div class="bg-[#2d2d2d] px-4 py-2 flex items-center justify-between border-b border-white/5">
+                    <span class="text-xs font-mono text-brand-muted">lab1_basics.py</span>
+                    <div class="flex gap-1.5">
+                        <div class="w-3 h-3 rounded-full bg-red-500/50"></div>
+                        <div class="w-3 h-3 rounded-full bg-yellow-500/50"></div>
+                        <div class="w-3 h-3 rounded-full bg-green-500/50"></div>
+                    </div>
+                </div>
+                <div class="p-4 overflow-x-auto">
+<pre><code class="language-python">import cv2
+import numpy as np
+
+# 1. Load an Image
+# '0' flag loads the image directly in Grayscale
+img = cv2.imread('dataset/sample.jpg', 0)
+
+# Check if image is loaded
+if img is None:
+    print("Error: Could not open or find the image.")
+else:
+    # 2. Resize the image
+    # Resize to 50% of original width and height
+    resized_img = cv2.resize(img, (0,0), fx=0.5, fy=0.5)
+
+    # 3. Apply Gaussian Blur (Noise Reduction)
+    blurred = cv2.GaussianBlur(resized_img, (5, 5), 0)
+
+    # 4. Edge Detection (Canny)
+    edges = cv2.Canny(blurred, 100, 200)
+
+    # Display Result
+    cv2.imshow('Edges', edges)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+</code></pre>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 3: ML Workflow Diagram -->
+    <section id="workflow" class="container mx-auto px-6 mb-24">
+        <div class="text-center mb-16">
+            <h4 class="text-brand-secondary font-bold tracking-widest uppercase text-sm mb-2">Chapter 02</h4>
+            <h2 class="text-3xl md:text-4xl font-bold mb-4">The Machine Learning Pipeline</h2>
+            <p class="text-brand-muted max-w-2xl mx-auto">
+                Machine Learning is not magic; it is a structured process. Below is the standard pipeline used in this course to develop applications using Teachable Machines or TensorFlow.
+            </p>
+        </div>
+
+        <!-- Custom HTML/Tailwind Flowchart -->
+        <div class="relative max-w-5xl mx-auto">
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+                
+                <!-- Step 1 -->
+                <div class="flow-step md:flow-line flow-line-last md:flow-line-last-off flex flex-col items-center text-center group">
+                    <div class="w-16 h-16 rounded-2xl bg-brand-light border-2 border-brand-primary flex items-center justify-center text-2xl mb-4 shadow-[0_0_20px_rgba(14,165,233,0.3)] z-10 relative group-hover:scale-110 transition-transform">
+                        📥
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-2">1. Collection</h3>
+                    <p class="text-xs text-brand-muted">Gather raw data (Images, Videos). Diversity in data is key.</p>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="flow-step md:flow-line flow-line-last md:flow-line-last-off flex flex-col items-center text-center group">
+                    <div class="w-16 h-16 rounded-2xl bg-brand-light border-2 border-brand-secondary flex items-center justify-center text-2xl mb-4 shadow-[0_0_20px_rgba(99,102,241,0.3)] z-10 relative group-hover:scale-110 transition-transform">
+                        🧹
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-2">2. Preparation</h3>
+                    <p class="text-xs text-brand-muted">Clean, label, and split data into Training (80%) and Testing (20%) sets.</p>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="flow-step md:flow-line flow-line-last md:flow-line-last-off flex flex-col items-center text-center group">
+                    <div class="w-16 h-16 rounded-2xl bg-brand-light border-2 border-brand-accent flex items-center justify-center text-2xl mb-4 shadow-[0_0_20px_rgba(244,63,94,0.3)] z-10 relative group-hover:scale-110 transition-transform">
+                        ⚙️
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-2">3. Training</h3>
+                    <p class="text-xs text-brand-muted">Feed data into the model (CNN). The model learns patterns (features).</p>
+                </div>
+
+                <!-- Step 4 -->
+                <div class="flow-step md:flow-line flow-line-last md:flow-line-last-off flex flex-col items-center text-center group">
+                    <div class="w-16 h-16 rounded-2xl bg-brand-light border-2 border-purple-500 flex items-center justify-center text-2xl mb-4 shadow-[0_0_20px_rgba(168,85,247,0.3)] z-10 relative group-hover:scale-110 transition-transform">
+                        📈
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-2">4. Evaluation</h3>
+                    <p class="text-xs text-brand-muted">Test model accuracy against unseen data. Tune hyperparameters.</p>
+                </div>
+
+                <!-- Step 5 -->
+                <div class="flow-step flex flex-col items-center text-center group">
+                    <div class="w-16 h-16 rounded-2xl bg-brand-light border-2 border-green-500 flex items-center justify-center text-2xl mb-4 shadow-[0_0_20px_rgba(34,197,94,0.3)] z-10 relative group-hover:scale-110 transition-transform">
+                        🚀
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-2">5. Deployment</h3>
+                    <p class="text-xs text-brand-muted">Integrate model into a Python App or Web Interface.</p>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 4: Training Metrics Visualization -->
+    <section id="training" class="container mx-auto px-6 mb-24">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            
+            <div class="order-2 lg:order-1 chart-container">
+                <canvas id="trainingChart"></canvas>
+            </div>
+
+            <div class="order-1 lg:order-2">
+                <h4 class="text-brand-accent font-bold tracking-widest uppercase text-sm mb-2">Chapter 03</h4>
+                <h2 class="text-3xl font-bold mb-6">Understanding Model Metrics</h2>
+                <p class="text-brand-muted mb-6">
+                    When training a Neural Network in TensorFlow, we monitor two key metrics: <strong>Loss</strong> and <strong>Accuracy</strong>.
+                </p>
+                <div class="space-y-6">
+                    <div class="glass-panel p-6 rounded-xl border-l-4 border-brand-primary">
+                        <h5 class="text-xl font-bold text-white mb-2">The Loss Curve (Blue)</h5>
+                        <p class="text-sm text-brand-muted">
+                            "Loss" represents the error. A lower loss means the model's predictions are closer to the actual labels. We want this line to go <strong>down</strong> over time (Epochs).
+                        </p>
+                    </div>
+                    <div class="glass-panel p-6 rounded-xl border-l-4 border-brand-accent">
+                        <h5 class="text-xl font-bold text-white mb-2">The Accuracy Curve (Red)</h5>
+                        <p class="text-sm text-brand-muted">
+                            "Accuracy" is the percentage of correct predictions. We want this line to go <strong>up</strong>. If Training Accuracy is high but Validation Accuracy is low, the model is <em>Overfitting</em> (memorizing data instead of learning).
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 5: Practical Project & Guidelines -->
+    <section id="practical" class="container mx-auto px-6 mb-24">
+        <div class="bg-gradient-to-br from-brand-light to-brand-dark border border-white/10 rounded-3xl p-8 md:p-16 text-center">
+            <h2 class="text-3xl md:text-5xl font-bold mb-8">Mini Project Guidelines</h2>
+            <p class="text-lg text-brand-muted max-w-3xl mx-auto mb-12">
+                The core of DEC50302 is the development of a functional Computer Vision Application. Students are required to work in groups to solve a real-world problem.
+            </p>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-left">
+                <div class="bg-brand-dark/50 p-6 rounded-xl border border-white/5 hover:border-brand-primary/50 transition-colors">
+                    <div class="text-4xl mb-4">😷</div>
+                    <h3 class="text-xl font-bold text-white mb-2">Example 1: Safety</h3>
+                    <p class="text-sm text-brand-muted">
+                        <strong>Face Mask Detection System.</strong><br>
+                        Train a model to classify faces as "Mask" or "No Mask" and trigger an alert.
+                    </p>
+                </div>
+                <div class="bg-brand-dark/50 p-6 rounded-xl border border-white/5 hover:border-brand-secondary/50 transition-colors">
+                    <div class="text-4xl mb-4">🍎</div>
+                    <h3 class="text-xl font-bold text-white mb-2">Example 2: Agriculture</h3>
+                    <p class="text-sm text-brand-muted">
+                        <strong>Fruit Quality Grader.</strong><br>
+                        Classify fruits based on ripeness or defects using image data collected from the field.
+                    </p>
+                </div>
+                <div class="bg-brand-dark/50 p-6 rounded-xl border border-white/5 hover:border-brand-accent/50 transition-colors">
+                    <div class="text-4xl mb-4">🖐️</div>
+                    <h3 class="text-xl font-bold text-white mb-2">Example 3: Interaction</h3>
+                    <p class="text-sm text-brand-muted">
+                        <strong>Gesture Control.</strong><br>
+                        Control a simple game or volume interface using hand gestures recognized via webcam.
+                    </p>
+                </div>
+            </div>
+
+            <div class="mt-12 inline-block">
+                <div class="glass-panel px-8 py-4 rounded-full border border-brand-primary/30">
+                    <span class="text-brand-primary font-bold">Requirement:</span>
+                    <span class="text-white ml-2">Must use Python, OpenCV, and a trained Model.</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="border-t border-white/10 bg-brand-dark pt-12 pb-8">
+        <div class="container mx-auto px-6 text-center">
+            <h2 class="text-2xl font-bold text-white mb-4">DEC50302 Machine Learning in Computer Vision</h2>
+            <p class="text-brand-muted mb-8">Department of Polytechnic and Community College Education, Ministry of Higher Education</p>
+            <div class="text-sm text-brand-muted opacity-50">
+                &copy; 2025 Digital Learning Module. Generated for educational purposes.
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts for Charts -->
+    <script>
+        // Common Chart Defaults
+        Chart.defaults.color = '#94a3b8';
+        Chart.defaults.font.family = 'Inter';
+
+        // 1. Assessment Chart (Donut)
+        const ctxAssessment = document.getElementById('assessmentChart').getContext('2d');
+        new Chart(ctxAssessment, {
+            type: 'doughnut',
+            data: {
+                labels: ['Practical Work (Lab)', 'Mini Project', 'Theory Test'],
+                datasets: [{
+                    data: [40, 40, 20],
+                    backgroundColor: [
+                        '#0ea5e9', // Primary (Blue)
+                        '#6366f1', // Secondary (Indigo)
+                        '#f43f5e'  // Accent (Rose)
+                    ],
+                    borderWidth: 0,
+                    hoverOffset: 10
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { padding: 20, usePointStyle: true }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            title: function(tooltipItems) {
+                                const item = tooltipItems[0];
+                                let label = item.chart.data.labels[item.dataIndex];
+                                if (Array.isArray(label)) return label.join(' ');
+                                return label;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // 2. Training Metrics Chart (Line)
+        const ctxTraining = document.getElementById('trainingChart').getContext('2d');
+        new Chart(ctxTraining, {
+            type: 'line',
+            data: {
+                labels: ['Epoch 1', 'Epoch 2', 'Epoch 3', 'Epoch 4', 'Epoch 5', 'Epoch 6', 'Epoch 7', 'Epoch 8', 'Epoch 9', 'Epoch 10'],
+                datasets: [
+                    {
+                        label: 'Training Loss',
+                        data: [0.9, 0.7, 0.5, 0.4, 0.35, 0.3, 0.25, 0.22, 0.2, 0.18],
+                        borderColor: '#0ea5e9',
+                        backgroundColor: 'rgba(14, 165, 233, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    },
+                    {
+                        label: 'Model Accuracy',
+                        data: [0.5, 0.65, 0.75, 0.8, 0.85, 0.88, 0.9, 0.92, 0.93, 0.95],
+                        borderColor: '#f43f5e',
+                        backgroundColor: 'rgba(244, 63, 94, 0.0)',
+                        tension: 0.4,
+                        borderDash: [5, 5]
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 1.0,
+                        grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                    },
+                    x: {
+                        grid: { display: false }
+                    }
+                },
+                plugins: {
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                        callbacks: {
+                            title: function(tooltipItems) {
+                                const item = tooltipItems[0];
+                                let label = item.chart.data.labels[item.dataIndex];
+                                if (Array.isArray(label)) return label.join(' ');
+                                return label;
+                            }
+                        }
+                    },
+                    legend: {
+                        position: 'top',
+                        labels: { usePointStyle: true }
+                    }
+                }
+            }
+        });
+    </script>
+
+    <!-- COMMENT: Chosen Palette is 'Vibrant Tech' (Cyan/Indigo/Rose on Slate Dark). -->
+    <!-- COMMENT: NO SVG used. NO Mermaid JS used. All diagrams are HTML/CSS or Chart.js. -->
+    <!-- DESIGN BY: zoolfahmy POLIMAS. -->
+</body>
+</html>

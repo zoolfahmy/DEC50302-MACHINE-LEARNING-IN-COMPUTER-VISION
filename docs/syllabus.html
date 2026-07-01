@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DEC50302: Machine Learning in CV | Digital Textbook</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+
+    <!-- 
+    PALETTE: Vibrant Tech
+    Primary: #0ea5e9 (Sky 500)
+    Secondary: #6366f1 (Indigo 500)
+    Accent: #f43f5e (Rose 500)
+    Background: #0f172a (Slate 900)
+    Text: #f8fafc (Slate 50)
+    -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            dark: '#0f172a',
+                            light: '#1e293b',
+                            primary: '#0ea5e9',
+                            secondary: '#6366f1',
+                            accent: '#f43f5e',
+                            text: '#f8fafc',
+                            muted: '#94a3b8'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['Fira Code', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Force dark background on HTML and Body to prevent cut-off */
+        html, body {
+            background-color: #0f172a;
+            color: #f8fafc;
+            min-height: 100vh;
+        }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            height: 350px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+        
+        .timeline-line::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 20px;
+            width: 2px;
+            background: linear-gradient(to bottom, #0ea5e9, #6366f1);
+            z-index: 0;
+        }
+        @media (min-width: 768px) {
+            .timeline-line::before {
+                left: 50%;
+                transform: translateX(-1px);
+            }
+        }
+        
+        /* Glass Panel - Ensures visibility against dark bg */
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.7); /* Slate 800 with opacity */
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Helper for code block background if JIT fails */
+        .bg-code-dark {
+            background-color: #1e1e1e;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+        
+        /* Table Styles */
+        .custom-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .custom-table th, .custom-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .custom-table th {
+            font-weight: bold;
+            color: #0ea5e9;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 0.05em;
+        }
+        .custom-table tr:last-child td {
+            border-bottom: none;
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-brand-primary selection:text-white pb-20">
+
+    <!-- Navigation -->
+    <nav class="sticky top-0 z-50 glass-panel border-b border-white/10 shadow-lg">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 bg-gradient-to-br from-brand-primary to-brand-secondary rounded-lg flex items-center justify-center font-bold text-white">CV</div>
+                <h1 class="text-xl font-bold tracking-tight text-white">DEC50302 <span class="text-brand-primary font-normal">| Sesi 2 2025/2026</span></h1>
+            </div>
+            <div class="hidden md:flex gap-6 text-sm font-medium text-brand-muted">
+                <a href="#objectives" class="hover:text-brand-primary transition-colors">Objectives</a>
+                <a href="#resources" class="hover:text-brand-primary transition-colors">Textbook &amp; Labs</a>
+                <a href="#schedule" class="hover:text-brand-primary transition-colors">Schedule</a>
+                <a href="#foundations" class="hover:text-brand-primary transition-colors">Modules</a>
+                <a href="#projects" class="hover:text-brand-primary transition-colors">Assessment</a>
+                <a href="index.html" class="ml-2 bg-brand-primary/20 text-brand-primary border border-brand-primary/30 px-3 py-1.5 rounded-full hover:bg-brand-primary/30 transition-colors">← Course Overview</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 1. HERO SECTION: Course Overview & Objectives -->
+    <header id="overview" class="relative pt-24 pb-24 overflow-hidden">
+        <!-- Background Effect -->
+        <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1620712943543-bcc4688e7485?q=80&w=2000&auto=format&fit=crop')] bg-cover bg-center opacity-10"></div>
+        <div class="absolute inset-0 bg-gradient-to-b from-brand-dark/80 via-brand-dark/95 to-brand-dark"></div>
+        
+        <div class="container mx-auto px-6 relative z-10">
+            <!-- Title Block -->
+            <div class="text-center mb-16">
+                <span class="inline-block py-1 px-4 rounded-full bg-brand-primary/10 text-brand-primary border border-brand-primary/20 text-sm font-bold tracking-wide mb-6 uppercase">
+                    Department of Electrical Engineering
+                </span>
+                <h1 class="text-5xl md:text-7xl font-bold mb-6 text-white tracking-tight">
+                    Machine Learning in<br>
+                    <span class="bg-clip-text text-transparent bg-gradient-to-r from-brand-primary via-white to-brand-secondary">Computer Vision</span>
+                </h1>
+                <p class="text-lg md:text-xl text-brand-muted max-w-3xl mx-auto leading-relaxed">
+                    This course introduces the software and foundation of basic Machine Learning knowledge to develop applications. It covers <strong>Python programming</strong>, <strong>OpenCV image processing</strong>, and <strong>ML workflows</strong> (TensorFlow/Teachable Machine) to process images, graphics, and video.
+                </p>
+                <div class="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
+                    <a href="#resources" class="bg-brand-primary hover:bg-sky-400 text-white font-bold py-3 px-8 rounded-full transition-colors shadow-lg shadow-brand-primary/30">📘 Open the Textbook</a>
+                    <a href="#resources" class="bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold py-3 px-8 rounded-full transition-colors">🧪 Start Practical Work 1</a>
+                </div>
+            </div>
+
+            <!-- OBJECTIVES DASHBOARD (CLO, PLO, PEO) -->
+            <div id="objectives" class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                
+                <!-- LEFT COL: Course Learning Outcomes (CLO) -->
+                <div class="lg:col-span-12 xl:col-span-7 space-y-6">
+                    <h3 class="text-2xl font-bold text-white flex items-center gap-3">
+                        <span class="w-2 h-8 bg-brand-primary rounded-full"></span>
+                        Course Learning Outcomes (CLO)
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <!-- CLO 1 -->
+                        <div class="glass-panel p-6 rounded-xl border-t-4 border-brand-primary hover:-translate-y-1 transition-transform duration-300">
+                            <div class="flex justify-between items-start mb-4">
+                                <span class="text-3xl font-bold text-white/20">01</span>
+                                <span class="bg-brand-primary/20 text-brand-primary text-xs font-bold px-2 py-1 rounded">C3, PLO 1</span>
+                            </div>
+                            <h4 class="text-lg font-bold text-white mb-2">Apply ML Methods</h4>
+                            <p class="text-sm text-brand-muted">Develop applications using Python and OpenCV.</p>
+                        </div>
+                        
+                        <!-- CLO 2 -->
+                        <div class="glass-panel p-6 rounded-xl border-t-4 border-brand-secondary hover:-translate-y-1 transition-transform duration-300">
+                            <div class="flex justify-between items-start mb-4">
+                                <span class="text-3xl font-bold text-white/20">02</span>
+                                <span class="bg-brand-secondary/20 text-brand-secondary text-xs font-bold px-2 py-1 rounded">P4, PLO 4</span>
+                            </div>
+                            <h4 class="text-lg font-bold text-white mb-2">Construct Apps</h4>
+                            <p class="text-sm text-brand-muted">Build suitable applications using Machine Learning methods.</p>
+                        </div>
+
+                        <!-- CLO 3 -->
+                        <div class="glass-panel p-6 rounded-xl border-t-4 border-brand-accent hover:-translate-y-1 transition-transform duration-300">
+                            <div class="flex justify-between items-start mb-4">
+                                <span class="text-3xl font-bold text-white/20">03</span>
+                                <span class="bg-brand-accent/20 text-brand-accent text-xs font-bold px-2 py-1 rounded">A3, PLO 11</span>
+                            </div>
+                            <h4 class="text-lg font-bold text-white mb-2">Continuous Learning</h4>
+                            <p class="text-sm text-brand-muted">Demonstrate independent acquisition of new knowledge and skills.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RIGHT COL: Strategic Alignment (PEO & PLO) -->
+                <div class="lg:col-span-12 xl:col-span-5 flex flex-col gap-6">
+                    <div class="glass-panel p-6 rounded-xl border border-white/5 flex-grow">
+                        <!-- Tabs / Sections for PLO & PEO -->
+                        <div class="space-y-6">
+                            
+                            <!-- PLOs -->
+                            <div>
+                                <h3 class="text-lg font-bold text-white mb-3 flex items-center gap-2">
+                                    <span class="text-brand-secondary">🎯</span> Programme Learning Outcomes
+                                </h3>
+                                <ul class="space-y-3">
+                                    <li class="flex gap-3 text-sm">
+                                        <div class="min-w-[40px] font-mono text-brand-secondary font-bold">PLO1</div>
+                                        <div class="text-brand-muted">Apply knowledge of applied math, science, and engineering fundamentals (DK1-DK4).</div>
+                                    </li>
+                                    <li class="flex gap-3 text-sm">
+                                        <div class="min-w-[40px] font-mono text-brand-secondary font-bold">PLO4</div>
+                                        <div class="text-brand-muted">Conduct investigation of well-defined problems and standard tests (DK8).</div>
+                                    </li>
+                                    <li class="flex gap-3 text-sm">
+                                        <div class="min-w-[40px] font-mono text-brand-secondary font-bold">PLO11</div>
+                                        <div class="text-brand-muted">Ability for independent, lifelong learning and critical thinking (DK8).</div>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <div class="w-full h-px bg-white/10"></div>
+
+                            <!-- PEOs (DET) -->
+                            <div>
+                                <h3 class="text-lg font-bold text-white mb-3 flex items-center gap-2">
+                                    <span class="text-brand-accent">🚀</span> PEO (DET)
+                                </h3>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                                    <div class="bg-brand-light/50 p-2 rounded border border-white/5">
+                                        <strong class="text-white block">PEO 1</strong>
+                                        <span class="text-brand-muted">Practising Technician in Electrical Engineering.</span>
+                                    </div>
+                                    <div class="bg-brand-light/50 p-2 rounded border border-white/5">
+                                        <strong class="text-white block">PEO 2</strong>
+                                        <span class="text-brand-muted">Contributing with Professional Ethics.</span>
+                                    </div>
+                                    <div class="bg-brand-light/50 p-2 rounded border border-white/5">
+                                        <strong class="text-white block">PEO 3</strong>
+                                        <span class="text-brand-muted">Engaging in Enterprising Activities.</span>
+                                    </div>
+                                    <div class="bg-brand-light/50 p-2 rounded border border-white/5">
+                                        <strong class="text-white block">PEO 4</strong>
+                                        <span class="text-brand-muted">Continuous Professional Development.</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 2. KEY FEATURES -->
+    <section id="features" class="container mx-auto px-6 mb-24 relative z-20">
+        <div class="border-y border-white/10 py-12">
+            <h2 class="text-2xl font-bold text-center text-white mb-10">Digital Textbook Features</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <!-- Feature 1 -->
+                <div class="text-center">
+                    <div class="w-12 h-12 mx-auto rounded-lg bg-brand-primary/20 flex items-center justify-center text-2xl mb-4 text-brand-primary">💻</div>
+                    <h3 class="text-lg font-bold text-white mb-1">Active Learning</h3>
+                    <p class="text-sm text-brand-muted">Live Code Blocks & Charts</p>
+                </div>
+                <!-- Feature 2 -->
+                <div class="text-center">
+                    <div class="w-12 h-12 mx-auto rounded-lg bg-brand-secondary/20 flex items-center justify-center text-2xl mb-4 text-brand-secondary">📊</div>
+                    <h3 class="text-lg font-bold text-white mb-1">Visual Syllabus</h3>
+                    <p class="text-sm text-brand-muted">Interactive Assessment Data</p>
+                </div>
+                <!-- Feature 3 -->
+                <div class="text-center">
+                    <div class="w-12 h-12 mx-auto rounded-lg bg-brand-accent/20 flex items-center justify-center text-2xl mb-4 text-brand-accent">📈</div>
+                    <h3 class="text-lg font-bold text-white mb-1">Live Metrics</h3>
+                    <p class="text-sm text-brand-muted">Loss vs. Accuracy Viz</p>
+                </div>
+                <!-- Feature 4 -->
+                <div class="text-center">
+                    <div class="w-12 h-12 mx-auto rounded-lg bg-green-500/20 flex items-center justify-center text-2xl mb-4 text-green-400">💡</div>
+                    <h3 class="text-lg font-bold text-white mb-1">Project Ideas</h3>
+                    <p class="text-sm text-brand-muted">Real-world Scenarios</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ================= RESOURCES: FULL TEXTBOOK + PRACTICAL WORK LABS ================= -->
+    <section id="resources" class="container mx-auto px-6 mb-24 relative z-20">
+        <div class="text-center mb-12">
+            <h4 class="text-brand-primary font-bold tracking-widest uppercase text-sm mb-2">Your Companion Volumes</h4>
+            <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">Full Digital Textbook &amp; Lab Companion</h2>
+            <p class="text-brand-muted max-w-2xl mx-auto">
+                Everything on this page links back to two complete, downloadable volumes: the full course textbook and the step-by-step guide for all 5 Practical Works. Tap a card to open it.
+            </p>
+        </div>
+
+        <!-- Two primary volume cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
+            <!-- Textbook Card -->
+            <div class="glass-panel rounded-2xl p-8 border-t-4 border-brand-primary hover:-translate-y-1 transition-transform duration-300 flex flex-col">
+                <div class="flex items-start justify-between mb-4">
+                    <div class="text-4xl">📘</div>
+                    <span class="bg-brand-primary/20 text-brand-primary text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">Main Textbook</span>
+                </div>
+                <h3 class="text-2xl font-bold text-white mb-2">Seeing Like a Machine</h3>
+                <p class="text-sm text-brand-muted mb-6 flex-grow">
+                    The full storytelling-style textbook for DEC50302 — Python foundations, OpenCV, Machine Learning applications, four applied projects, active learning, and AI ethics, following Amir's Smart Guardhouse build.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-3">
+                    <a href="assets/textbook/Seeing_Like_a_Machine_DEC50302_Textbook.pdf" target="_blank" rel="noopener"
+                       class="flex-1 text-center bg-brand-primary hover:bg-sky-400 text-white font-bold py-3 px-4 rounded-xl transition-colors shadow-lg shadow-brand-primary/20">
+                       📖 Open Textbook (PDF)
+                    </a>
+                    <a href="assets/textbook/Seeing_Like_a_Machine_DEC50302_Textbook.docx" download
+                       class="flex-1 text-center bg-white/5 hover:bg-white/10 border border-white/20 text-white font-semibold py-3 px-4 rounded-xl transition-colors">
+                       ⬇️ Download DOCX
+                    </a>
+                </div>
+                <!-- Quick chapter jump chips -->
+                <div class="mt-5 pt-5 border-t border-white/10">
+                    <p class="text-xs font-bold text-brand-muted uppercase tracking-wide mb-2">Jump to a Unit</p>
+                    <div class="flex flex-wrap gap-2">
+                        <a href="assets/textbook/Seeing_Like_a_Machine_DEC50302_Textbook.pdf#page=3" target="_blank" rel="noopener" class="text-xs bg-brand-light hover:bg-brand-primary/30 text-brand-muted hover:text-white px-3 py-1.5 rounded-full border border-white/10 transition-colors">Unit 1 · Python</a>
+                        <a href="assets/textbook/Seeing_Like_a_Machine_DEC50302_Textbook.pdf#page=13" target="_blank" rel="noopener" class="text-xs bg-brand-light hover:bg-brand-primary/30 text-brand-muted hover:text-white px-3 py-1.5 rounded-full border border-white/10 transition-colors">Unit 2 · OpenCV</a>
+                        <a href="assets/textbook/Seeing_Like_a_Machine_DEC50302_Textbook.pdf#page=20" target="_blank" rel="noopener" class="text-xs bg-brand-light hover:bg-brand-primary/30 text-brand-muted hover:text-white px-3 py-1.5 rounded-full border border-white/10 transition-colors">Unit 3 · ML</a>
+                        <a href="assets/textbook/Seeing_Like_a_Machine_DEC50302_Textbook.pdf#page=25" target="_blank" rel="noopener" class="text-xs bg-brand-light hover:bg-brand-primary/30 text-brand-muted hover:text-white px-3 py-1.5 rounded-full border border-white/10 transition-colors">Unit 4 · Projects</a>
+                        <a href="assets/textbook/Seeing_Like_a_Machine_DEC50302_Textbook.pdf#page=29" target="_blank" rel="noopener" class="text-xs bg-brand-light hover:bg-brand-primary/30 text-brand-muted hover:text-white px-3 py-1.5 rounded-full border border-white/10 transition-colors">Unit 5 · Assessment</a>
+                        <a href="assets/textbook/Seeing_Like_a_Machine_DEC50302_Textbook.pdf#page=31" target="_blank" rel="noopener" class="text-xs bg-brand-light hover:bg-brand-primary/30 text-brand-muted hover:text-white px-3 py-1.5 rounded-full border border-white/10 transition-colors">Unit 6 · Ethics</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lab Companion Card -->
+            <div class="glass-panel rounded-2xl p-8 border-t-4 border-brand-secondary hover:-translate-y-1 transition-transform duration-300 flex flex-col">
+                <div class="flex items-start justify-between mb-4">
+                    <div class="text-4xl">🧪</div>
+                    <span class="bg-brand-secondary/20 text-brand-secondary text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">Lab Companion</span>
+                </div>
+                <h3 class="text-2xl font-bold text-white mb-2">Amir's Lab Companion</h3>
+                <p class="text-sm text-brand-muted mb-6 flex-grow">
+                    The full step-by-step build guide for Practical Work 1–5 — matching your official CIDOS lab sheets exactly, with fixed/robust code, troubleshooting notes, and links back to the textbook theory.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-3">
+                    <a href="assets/labs/Amirs_Lab_Companion_PW1-5.pdf" target="_blank" rel="noopener"
+                       class="flex-1 text-center bg-brand-secondary hover:bg-indigo-400 text-white font-bold py-3 px-4 rounded-xl transition-colors shadow-lg shadow-brand-secondary/20">
+                       📖 Open Companion (PDF)
+                    </a>
+                    <a href="assets/labs/Amirs_Lab_Companion_PW1-5.docx" download
+                       class="flex-1 text-center bg-white/5 hover:bg-white/10 border border-white/20 text-white font-semibold py-3 px-4 rounded-xl transition-colors">
+                       ⬇️ Download DOCX
+                    </a>
+                </div>
+                <div class="mt-5 pt-5 border-t border-white/10">
+                    <p class="text-xs font-bold text-brand-muted uppercase tracking-wide mb-2">All 5 Practical Works below ↓</p>
+                    <p class="text-xs text-brand-muted">Each card opens straight to that lab's page in the Companion PDF.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Five Practical Work quick-open cards -->
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+            <a href="assets/labs/Amirs_Lab_Companion_PW1-5.pdf#page=2" target="_blank" rel="noopener"
+               class="group bg-brand-light/50 hover:bg-brand-primary/20 border border-white/5 hover:border-brand-primary/50 rounded-xl p-4 text-center transition-all">
+                <div class="text-2xl mb-2 group-hover:scale-110 transition-transform">🐍</div>
+                <div class="text-xs font-bold text-brand-primary uppercase tracking-wide mb-1">PW 1</div>
+                <div class="text-xs text-white font-semibold leading-snug">Intro to Python</div>
+            </a>
+            <a href="assets/labs/Amirs_Lab_Companion_PW1-5.pdf#page=9" target="_blank" rel="noopener"
+               class="group bg-brand-light/50 hover:bg-brand-primary/20 border border-white/5 hover:border-brand-primary/50 rounded-xl p-4 text-center transition-all">
+                <div class="text-2xl mb-2 group-hover:scale-110 transition-transform">🖼️</div>
+                <div class="text-xs font-bold text-brand-primary uppercase tracking-wide mb-1">PW 2</div>
+                <div class="text-xs text-white font-semibold leading-snug">Image Processing Basics</div>
+            </a>
+            <a href="assets/labs/Amirs_Lab_Companion_PW1-5.pdf#page=17" target="_blank" rel="noopener"
+               class="group bg-brand-light/50 hover:bg-brand-secondary/20 border border-white/5 hover:border-brand-secondary/50 rounded-xl p-4 text-center transition-all">
+                <div class="text-2xl mb-2 group-hover:scale-110 transition-transform">🎯</div>
+                <div class="text-xs font-bold text-brand-secondary uppercase tracking-wide mb-1">PW 3</div>
+                <div class="text-xs text-white font-semibold leading-snug">OpenCV Image &amp; Video</div>
+            </a>
+            <a href="assets/labs/Amirs_Lab_Companion_PW1-5.pdf#page=37" target="_blank" rel="noopener"
+               class="group bg-brand-light/50 hover:bg-brand-secondary/20 border border-white/5 hover:border-brand-secondary/50 rounded-xl p-4 text-center transition-all">
+                <div class="text-2xl mb-2 group-hover:scale-110 transition-transform">🤖</div>
+                <div class="text-xs font-bold text-brand-secondary uppercase tracking-wide mb-1">PW 4</div>
+                <div class="text-xs text-white font-semibold leading-snug">Teachable Machine &amp; TensorFlow</div>
+            </a>
+            <a href="assets/labs/Amirs_Lab_Companion_PW1-5.pdf#page=46" target="_blank" rel="noopener"
+               class="group bg-brand-light/50 hover:bg-brand-accent/20 border border-white/5 hover:border-brand-accent/50 rounded-xl p-4 text-center transition-all">
+                <div class="text-2xl mb-2 group-hover:scale-110 transition-transform">🚀</div>
+                <div class="text-xs font-bold text-brand-accent uppercase tracking-wide mb-1">PW 5</div>
+                <div class="text-xs text-white font-semibold leading-snug">YOLOv8 via VS Code &amp; Colab</div>
+            </a>
+        </div>
+    </section>
+    <!-- ================= END RESOURCES ================= -->
+
+    <!-- 3. TIMELINE SCHEDULE -->
+    <section id="schedule" class="container mx-auto px-6 mb-24 relative z-20">
+        <div class="text-center mb-16">
+            <h4 class="text-brand-primary font-bold tracking-widest uppercase text-sm mb-2">14-Week Roadmap</h4>
+            <h2 class="text-3xl md:text-4xl font-bold text-white">Teaching Schedule</h2>
+        </div>
+
+        <div class="relative timeline-line max-w-4xl mx-auto">
+            <!-- Week 1-4 -->
+            <div class="mb-12 relative pl-12 md:pl-0 md:flex md:justify-between items-center group">
+                <div class="md:w-[45%] md:text-right pr-8">
+                    <h3 class="text-xl font-bold text-white group-hover:text-brand-primary transition-colors">Weeks 1-4</h3>
+                    <h4 class="text-lg font-semibold text-brand-primary mb-2">Topic 1: Intro to Python</h4>
+                    <p class="text-sm text-brand-muted">Fundamentals, Functions, & OOP. Laying the groundwork for structured software development.</p>
+                </div>
+                <div class="absolute left-[11px] md:left-1/2 top-0 transform md:-translate-x-1/2 w-5 h-5 rounded-full bg-brand-dark border-4 border-brand-primary z-10"></div>
+                <div class="md:w-[45%] pl-8 mt-4 md:mt-0">
+                    <a href="assets/labs/Amirs_Lab_Companion_PW1-5.pdf#page=2" target="_blank" rel="noopener" class="block bg-brand-light/50 hover:bg-brand-primary/20 p-4 rounded-lg border border-white/5 hover:border-brand-primary/50 transition-colors">
+                        <span class="text-xs font-bold text-brand-accent uppercase">Assessment</span>
+                        <p class="text-sm text-white">Practical Work 1 (3.6h) <span class="text-brand-primary">→ Open Lab</span></p>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Week 5 -->
+            <div class="mb-12 relative pl-12 md:pl-0 md:flex md:justify-between items-center group flex-row-reverse">
+                <div class="md:w-[45%] md:text-left pl-8">
+                    <h3 class="text-xl font-bold text-white group-hover:text-brand-accent transition-colors">Week 5</h3>
+                    <h4 class="text-lg font-semibold text-brand-accent mb-2">Test 1 (20%)</h4>
+                    <p class="text-sm text-brand-muted">Covering Topic 1. A major milestone before moving to Computer Vision.</p>
+                </div>
+                <div class="absolute left-[11px] md:left-1/2 top-0 transform md:-translate-x-1/2 w-5 h-5 rounded-full bg-brand-dark border-4 border-brand-accent z-10 shadow-[0_0_15px_rgba(244,63,94,0.5)]"></div>
+                <div class="md:w-[45%] pr-8 mt-4 md:mt-0 md:text-right">
+                    <div class="bg-brand-light/50 p-4 rounded-lg border border-white/5 inline-block text-left md:text-right">
+                        <span class="text-xs font-bold text-green-400 uppercase">Transition</span>
+                        <p class="text-sm text-white">Start Topic 2: OpenCV</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Week 6-8 -->
+            <div class="mb-12 relative pl-12 md:pl-0 md:flex md:justify-between items-center group">
+                <div class="md:w-[45%] md:text-right pr-8">
+                    <h3 class="text-xl font-bold text-white group-hover:text-brand-secondary transition-colors">Weeks 6-8</h3>
+                    <h4 class="text-lg font-semibold text-brand-secondary mb-2">Topic 2: Intro to OpenCV</h4>
+                    <p class="text-sm text-brand-muted">Installation, Color-Spaces, Contours, & Image Processing Logic.</p>
+                </div>
+                <div class="absolute left-[11px] md:left-1/2 top-0 transform md:-translate-x-1/2 w-5 h-5 rounded-full bg-brand-dark border-4 border-brand-secondary z-10"></div>
+                <div class="md:w-[45%] pl-8 mt-4 md:mt-0">
+                    <ul class="space-y-2">
+                        <li>
+                            <a href="assets/labs/Amirs_Lab_Companion_PW1-5.pdf#page=9" target="_blank" rel="noopener" class="block bg-brand-light/50 hover:bg-brand-secondary/20 p-3 rounded border border-white/5 hover:border-brand-secondary/50 text-sm transition-colors">
+                                <span class="text-brand-secondary font-bold">PW 2:</span> Image Processing Basics <span class="text-brand-secondary">→</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="assets/labs/Amirs_Lab_Companion_PW1-5.pdf#page=17" target="_blank" rel="noopener" class="block bg-brand-light/50 hover:bg-brand-secondary/20 p-3 rounded border border-white/5 hover:border-brand-secondary/50 text-sm transition-colors">
+                                <span class="text-brand-secondary font-bold">PW 3:</span> OpenCV Image &amp; Video <span class="text-brand-secondary">→</span>
+                            </a>
+                        </li>
+                        <li class="bg-brand-light/50 p-3 rounded border border-white/5 text-sm">
+                            <span class="text-brand-accent font-bold">Week 8:</span> Test Topic 2
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Week 9-14 -->
+            <div class="relative pl-12 md:pl-0 md:flex md:justify-between items-center group flex-row-reverse">
+                <div class="md:w-[45%] md:text-left pl-8">
+                    <h3 class="text-xl font-bold text-white group-hover:text-green-400 transition-colors">Weeks 9-14</h3>
+                    <h4 class="text-lg font-semibold text-green-400 mb-2">Topic 3 & Mini Project</h4>
+                    <p class="text-sm text-brand-muted">Machine Learning Applications, Training Models, & Final Project Implementation.</p>
+                </div>
+                <div class="absolute left-[11px] md:left-1/2 top-0 transform md:-translate-x-1/2 w-5 h-5 rounded-full bg-brand-dark border-4 border-green-400 z-10"></div>
+                <div class="md:w-[45%] pr-8 mt-4 md:mt-0 md:text-right">
+                     <ul class="space-y-2">
+                        <li>
+                            <a href="assets/labs/Amirs_Lab_Companion_PW1-5.pdf#page=37" target="_blank" rel="noopener" class="block bg-brand-light/50 hover:bg-brand-secondary/20 p-3 rounded border border-white/5 hover:border-brand-secondary/50 text-sm transition-colors w-full">
+                                <span class="text-white font-bold">Practical Work 4</span> <span class="text-brand-secondary">→ Open Lab</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="assets/labs/Amirs_Lab_Companion_PW1-5.pdf#page=46" target="_blank" rel="noopener" class="block bg-brand-light/50 hover:bg-brand-accent/20 p-3 rounded border border-white/5 hover:border-brand-accent/50 text-sm transition-colors w-full">
+                                <span class="text-white font-bold">Practical Work 5</span> <span class="text-brand-accent">→ Open Lab</span>
+                            </a>
+                        </li>
+                        <li class="bg-brand-accent/20 p-3 rounded border border-brand-accent/30 text-sm inline-block w-full">
+                            <span class="text-brand-accent font-bold">Wk 12-14:</span> Mini Project (40%)
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. FOUNDATIONS MODULE (Active Learning Code) -->
+    <section id="foundations" class="container mx-auto px-6 mb-24">
+        <div class="flex items-end justify-between mb-12 border-b border-white/10 pb-4">
+            <div>
+                <h4 class="text-brand-primary font-bold tracking-widest uppercase text-sm mb-2">Module Details</h4>
+                <h2 class="text-3xl md:text-4xl font-bold text-white">Programming & Vision Fundamentals</h2>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+            
+            <!-- LEFT COLUMN: Topic 1 Details (Restored) -->
+            <div class="space-y-8">
+                <div>
+                    <h3 class="text-2xl font-bold text-white mb-4 border-l-4 border-brand-primary pl-4">Topic 1: Python Essentials</h3>
+                    <p class="text-brand-muted mb-4">Structured software development fundamentals.</p>
+                    <ul class="list-none space-y-3 bg-brand-light/30 p-6 rounded-xl border border-white/5">
+                        <li class="flex items-start gap-3">
+                            <span class="text-brand-primary font-mono text-sm">1.1</span>
+                            <span class="text-brand-muted text-sm"><strong>Basic Elements:</strong> Variables, Data Types, Control Flow.</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="text-brand-primary font-mono text-sm">1.3</span>
+                            <span class="text-brand-muted text-sm"><strong>Functions:</strong> Code reuse and modularity concepts.</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="text-brand-primary font-mono text-sm">1.4</span>
+                            <span class="text-brand-muted text-sm"><strong>OOP Features:</strong> Classes, Objects, Inheritance.</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 class="text-2xl font-bold text-white mb-4 border-l-4 border-brand-secondary pl-4">Topic 2: OpenCV Deep Dive</h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-brand-light p-4 rounded-lg border border-white/5">
+                            <strong class="text-brand-secondary block mb-1">Color-Space</strong>
+                            <span class="text-xs text-brand-muted">RGB to Grayscale/HSV logic.</span>
+                        </div>
+                        <div class="bg-brand-light p-4 rounded-lg border border-white/5">
+                            <strong class="text-brand-primary block mb-1">Contours</strong>
+                            <span class="text-xs text-brand-muted">Shape and boundary detection.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT COLUMN: Code Block -->
+            <div class="bg-code-dark rounded-xl overflow-hidden shadow-2xl border border-white/10 flex flex-col h-full">
+                <div class="bg-[#2d2d2d] px-4 py-2 flex items-center justify-between border-b border-white/5">
+                    <span class="text-xs font-mono text-brand-muted">topic2_contours.py</span>
+                    <div class="flex gap-1.5">
+                        <div class="w-3 h-3 rounded-full bg-red-500/50"></div>
+                        <div class="w-3 h-3 rounded-full bg-yellow-500/50"></div>
+                        <div class="w-3 h-3 rounded-full bg-green-500/50"></div>
+                    </div>
+                </div>
+                <div class="p-4 overflow-x-auto flex-grow">
+<pre><code class="language-python">import cv2
+import numpy as np
+
+# 1. Load Image
+image = cv2.imread('shape.jpg')
+gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+# 2. Thresholding (Binary Conversion)
+ret, thresh = cv2.threshold(gray, 127, 255, 0)
+
+# 3. Find Contours (RETR_TREE retrieves all)
+contours, hierarchy = cv2.findContours(thresh, 
+                                     cv2.RETR_TREE, 
+                                     cv2.CHAIN_APPROX_SIMPLE)
+
+# 4. Draw Contours (Green, Thickness 3)
+cv2.drawContours(image, contours, -1, (0, 255, 0), 3)
+
+cv2.imshow('Contours', image)
+cv2.waitKey(0)</code></pre>
+                </div>
+                <div class="p-4 bg-brand-light/30 border-t border-white/10">
+                    <p class="text-xs text-brand-muted"><strong class="text-brand-primary">Active Learning:</strong> This snippet connects Topic 1's Python syntax with Topic 2's OpenCV logic.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. ML WORKFLOW & METRICS -->
+    <section id="workflow" class="container mx-auto px-6 mb-24">
+        <div class="text-center mb-16">
+            <h4 class="text-brand-secondary font-bold tracking-widest uppercase text-sm mb-2">Topic 3</h4>
+            <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">Machine Learning Pipeline</h2>
+        </div>
+
+        <!-- 5-Step Flowchart -->
+        <div class="relative max-w-5xl mx-auto mb-16">
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+                <div class="flex flex-col items-center text-center group">
+                    <div class="w-16 h-16 rounded-2xl bg-brand-light border-2 border-brand-primary flex items-center justify-center text-2xl mb-4 transition-transform group-hover:scale-110">📥</div>
+                    <h3 class="text-sm font-bold text-white">1. Collection</h3>
+                </div>
+                <div class="flex flex-col items-center text-center group">
+                    <div class="w-16 h-16 rounded-2xl bg-brand-light border-2 border-brand-secondary flex items-center justify-center text-2xl mb-4 transition-transform group-hover:scale-110">🧹</div>
+                    <h3 class="text-sm font-bold text-white">2. Preparation</h3>
+                </div>
+                <div class="flex flex-col items-center text-center group">
+                    <div class="w-16 h-16 rounded-2xl bg-brand-light border-2 border-brand-accent flex items-center justify-center text-2xl mb-4 transition-transform group-hover:scale-110">⚙️</div>
+                    <h3 class="text-sm font-bold text-white">3. Training</h3>
+                </div>
+                <div class="flex flex-col items-center text-center group">
+                    <div class="w-16 h-16 rounded-2xl bg-brand-light border-2 border-purple-500 flex items-center justify-center text-2xl mb-4 transition-transform group-hover:scale-110">📈</div>
+                    <h3 class="text-sm font-bold text-white">4. Evaluation</h3>
+                </div>
+                <div class="flex flex-col items-center text-center group">
+                    <div class="w-16 h-16 rounded-2xl bg-brand-light border-2 border-green-500 flex items-center justify-center text-2xl mb-4 transition-transform group-hover:scale-110">🚀</div>
+                    <h3 class="text-sm font-bold text-white">5. Deployment</h3>
+                </div>
+            </div>
+        </div>
+
+        <!-- Metrics Chart -->
+        <div class="glass-panel p-8 rounded-2xl">
+             <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div class="chart-container">
+                    <canvas id="trainingChart"></canvas>
+                </div>
+                <div>
+                    <h4 class="text-brand-accent font-bold tracking-widest uppercase text-sm mb-2">Active Learning: Metrics</h4>
+                    <h2 class="text-2xl font-bold text-white mb-4">Understanding Loss vs. Accuracy</h2>
+                    <p class="text-brand-muted mb-4">
+                        This chart dynamically visualizes the ideal training scenario. Hover over the points to see how Model Accuracy increases as Training Loss decreases over 10 Epochs.
+                    </p>
+                    <ul class="space-y-2 text-sm text-brand-muted">
+                        <li class="flex items-center gap-2"><span class="w-3 h-3 bg-brand-primary rounded-full"></span> <strong>Loss (Blue):</strong> Error rate (aim for low).</li>
+                        <li class="flex items-center gap-2"><span class="w-3 h-3 bg-brand-accent rounded-full"></span> <strong>Accuracy (Red):</strong> Correct predictions (aim for high).</li>
+                    </ul>
+                </div>
+             </div>
+        </div>
+    </section>
+
+    <!-- 6. PROJECTS & ASSESSMENT -->
+    <section id="projects" class="container mx-auto px-6 mb-24">
+        <!-- Project Ideas -->
+        <div class="mb-16">
+            <h2 class="text-3xl font-bold mb-8 text-center text-white">Mini Project Inspiration</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="bg-brand-dark/50 p-6 rounded-xl border border-white/5 hover:border-brand-primary/50 transition-colors group">
+                    <div class="text-4xl mb-4 group-hover:scale-110 transition-transform">😷</div>
+                    <h3 class="text-xl font-bold text-white mb-2">Mask Detection</h3>
+                    <p class="text-sm text-brand-muted">Classify faces as "Mask" or "No Mask" and trigger an alert.</p>
+                </div>
+                <div class="bg-brand-dark/50 p-6 rounded-xl border border-white/5 hover:border-brand-secondary/50 transition-colors group">
+                    <div class="text-4xl mb-4 group-hover:scale-110 transition-transform">🍎</div>
+                    <h3 class="text-xl font-bold text-white mb-2">Fruit Grader</h3>
+                    <p class="text-sm text-brand-muted">Automated quality control: classify fruits by ripeness/defects.</p>
+                </div>
+                <div class="bg-brand-dark/50 p-6 rounded-xl border border-white/5 hover:border-brand-accent/50 transition-colors group">
+                    <div class="text-4xl mb-4 group-hover:scale-110 transition-transform">🖐️</div>
+                    <h3 class="text-xl font-bold text-white mb-2">Gesture Control</h3>
+                    <p class="text-sm text-brand-muted">Control game interfaces or volume using webcam hand gestures.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Assessment Chart & Table (Updated) -->
+        <div class="glass-panel p-8 rounded-2xl">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                <div class="chart-container">
+                    <canvas id="assessmentChart"></canvas>
+                </div>
+                <div>
+                    <h2 class="text-3xl font-bold mb-4 text-white">Course Assessment (100% CA)</h2>
+                    <p class="text-brand-muted mb-6">
+                        Evaluation is strictly continuous. The Mini Project is the largest component, split into three specific areas of assessment.
+                    </p>
+                    
+                    <!-- New Assessment Table -->
+                    <div class="overflow-x-auto">
+                        <table class="custom-table text-sm text-brand-muted">
+                            <thead>
+                                <tr>
+                                    <th>Assessment Component</th>
+                                    <th>Percentage</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="font-bold text-white">Practical Work</td>
+                                    <td>40%</td>
+                                </tr>
+                                <tr>
+                                    <td class="font-bold text-white">Test</td>
+                                    <td>20%</td>
+                                </tr>
+                                <tr>
+                                    <td class="font-bold text-white pt-4">Mini Project (Total)</td>
+                                    <td class="font-bold text-brand-accent pt-4">40%</td>
+                                </tr>
+                                <!-- Mini Project Breakdown -->
+                                <tr>
+                                    <td class="pl-6 italic text-xs border-none pb-0 pt-2">• Knowledge Component</td>
+                                    <td class="text-xs border-none pb-0 pt-2">25%</td>
+                                </tr>
+                                <tr>
+                                    <td class="pl-6 italic text-xs border-none pb-0">• Practical Skill</td>
+                                    <td class="text-xs border-none pb-0">10%</td>
+                                </tr>
+                                <tr>
+                                    <td class="pl-6 italic text-xs border-none">• Generic Skill</td>
+                                    <td class="text-xs border-none">5%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="border-t border-white/10 bg-brand-dark pt-12 pb-8">
+        <div class="container mx-auto px-6 text-center">
+            <h2 class="text-2xl font-bold text-white mb-4">DEC50302 Machine Learning in Computer Vision</h2>
+            <p class="text-brand-muted mb-8">Department of Electrical Engineering</p>
+            <div class="text-sm text-brand-muted opacity-50">
+                &copy; 2025/2026 Digital Textbook Designed by zoolfahmy@polimas.edu.my
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Chart Config
+        Chart.defaults.color = '#94a3b8';
+        Chart.defaults.font.family = 'Inter';
+
+        // 1. Assessment Breakdown - Labels Updated with %
+        const ctxAssessment = document.getElementById('assessmentChart').getContext('2d');
+        new Chart(ctxAssessment, {
+            type: 'doughnut',
+            data: {
+                labels: [
+                    'Practical Work (40%)', 
+                    'Test (20%)', 
+                    'Mini Project: Knowledge (25%)', 
+                    'Mini Project: Skill (10%)', 
+                    'Mini Project: Generic (5%)'
+                ],
+                datasets: [{
+                    data: [40, 20, 25, 10, 5],
+                    backgroundColor: ['#0ea5e9', '#6366f1', '#f43f5e', '#ec4899', '#8b5cf6'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { 
+                        position: 'right', 
+                        labels: { 
+                            boxWidth: 15, 
+                            padding: 15, 
+                            usePointStyle: true,
+                            font: { size: 11 }
+                        } 
+                    },
+                    tooltip: {
+                         callbacks: {
+                            title: function(tooltipItems) {
+                                const item = tooltipItems[0];
+                                let label = item.chart.data.labels[item.dataIndex];
+                                if (Array.isArray(label)) return label.join(' ');
+                                return label;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // 2. Training Metrics
+        const ctxTraining = document.getElementById('trainingChart').getContext('2d');
+        new Chart(ctxTraining, {
+            type: 'line',
+            data: {
+                labels: ['Epoch 1', 'Epoch 2', 'Epoch 3', 'Epoch 4', 'Epoch 5', 'Epoch 6', 'Epoch 7', 'Epoch 8', 'Epoch 9', 'Epoch 10'],
+                datasets: [
+                    {
+                        label: 'Loss',
+                        data: [0.9, 0.7, 0.5, 0.4, 0.35, 0.3, 0.25, 0.22, 0.2, 0.18],
+                        borderColor: '#0ea5e9',
+                        backgroundColor: 'rgba(14, 165, 233, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    },
+                    {
+                        label: 'Accuracy',
+                        data: [0.5, 0.65, 0.75, 0.8, 0.85, 0.88, 0.9, 0.92, 0.93, 0.95],
+                        borderColor: '#f43f5e',
+                        backgroundColor: 'rgba(244, 63, 94, 0.0)',
+                        tension: 0.4,
+                        borderDash: [5, 5]
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: { beginAtZero: true, max: 1.0, grid: { color: 'rgba(255, 255, 255, 0.1)' } },
+                    x: { grid: { display: false } }
+                },
+                plugins: {
+                     tooltip: {
+                         callbacks: {
+                            title: function(tooltipItems) {
+                                const item = tooltipItems[0];
+                                let label = item.chart.data.labels[item.dataIndex];
+                                if (Array.isArray(label)) return label.join(' ');
+                                return label;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
